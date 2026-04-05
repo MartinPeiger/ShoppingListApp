@@ -1,20 +1,27 @@
-import ItemRow from "./ItemRow";
-
-function ItemsList({ items, showResolved, onToggleResolved, onDeleteItem }) {
-  const filtered = showResolved ? items : items.filter(i => !i.resolved);
+export default function ItemsList({ items, showResolved, onToggleResolved, onDeleteItem }) {
+  const filteredItems = showResolved ? items : items.filter(item => !item.resolved);
 
   return (
-    <div>
-      {filtered.map(item => (
-        <ItemRow
-          key={item.id}
-          {...item}
-          onToggleResolved={onToggleResolved}
-          onDelete={onDeleteItem}
-        />
+    <ul>
+      {filteredItems.map(item => (
+        <li 
+          key={item.id} 
+          className="item" 
+          tabIndex={0} 
+          onKeyDown={(e) => {
+            if (e.key === "Enter") onToggleResolved(item.id);
+            if (e.key === "Delete") onDeleteItem(item.id);
+          }}
+        >
+          <span>{item.name}</span>
+          <button onClick={() => onToggleResolved(item.id)}>
+            {item.resolved ? "Neřešené" : "Vyřešit"}
+          </button>
+          <button onClick={() => onDeleteItem(item.id)}>
+            Smazat
+          </button>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }
-
-export default ItemsList;

@@ -1,38 +1,89 @@
-.App {
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #fceb96;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  max-width: 600px;
+  width: 100%;
+  margin: 40px auto;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+h1, h3 {
+  margin: 10px 0;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 10px 0;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+li {
+  margin-bottom: 2px;
+}
+
+form {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+input {
+  padding: 6px;
+  font-size: 14px;
+  text-align: center;
+}
+
+button {
+  padding: 5px 10px;
+  margin: 5px 2px;
+  cursor: pointer;
+}
+
+.item {
   display: flex;
-  flex-direction: column;
+  justify-content: center; 
+  align-items: center;
+  gap: 10px; 
+  padding: 2px 0;
+  outline: none;
+}
+
+.item:focus {
+  background-color: #fff2b2;
+}
+
+div {
+  margin-bottom: 15px;
+}
+
+.list-header-view {
+  display: flex;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  gap: 10px;
 }
 
-.App-link {
-  color: #61dafb;
+.list-header-view h1 {
+  margin: 0;
+  font-size: 1.5rem;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.list-header-editing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.list-header-editing input {
+  font-size: 1.2rem;
+  padding: 2px 5px;
 }

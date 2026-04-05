@@ -9,7 +9,7 @@ function ItemRow({ id, name, resolved, onToggleResolved, onDelete }) {
       <span style={{ textDecoration: resolved ? "line-through" : "none" }}>
         {name}
       </span>
-      <button onClick={() => onDelete(id)}>❌</button>
+      <button onClick={() => onDelete(id)}>Smazat</button>
     </div>
   );
 }
