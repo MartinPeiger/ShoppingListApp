@@ -1,10 +1,7 @@
 import ItemRow from "./ItemRow";
 
 function ItemsList({ items, showResolved, onToggleResolved, onDeleteItem }) {
-
-  const filtered = showResolved
-    ? items
-    : items.filter(i => !i.resolved);
+  const filtered = showResolved ? items : items.filter(i => !i.resolved);
 
   return (
     <div>

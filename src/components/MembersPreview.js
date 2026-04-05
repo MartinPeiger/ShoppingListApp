@@ -3,7 +3,7 @@ function MembersPreview({ members }) {
   return (
     <div>
 
-      <h3>Členové seznamu</h3>
+      <h3>Členové:</h3>
 
       <ul>
         {members.map(member => (
