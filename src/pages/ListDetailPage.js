@@ -1,106 +1,213 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+
 import ListHeader from "../components/ListHeader";
 import MembersPreview from "../components/MembersPreview";
 import AddItemForm from "../components/AddItemForm";
 import ItemsList from "../components/ItemsList";
 
-const INITIAL_LIST = {
-  id: "1",
-  name: "Víkend",
-  ownerId: "u1",
-  members: [
-    { id: "u1", name: "Martin" },
-    { id: "u2", name: "Tereza" }
-  ],
-  items: [
-    { id: "1", name: "Mléko", resolved: false },
-    { id: "2", name: "Chleba", resolved: true }
-  ]
-};
+import { api } from "../services/apiClient";
 
-// simulace přihlášeného uživatele
-const CURRENT_USER_ID = "u1"; // Martin – vlastník
+const CURRENT_USER_ID = "u1";
 
 export default function ListDetailPage() {
-  const [list, setList] = useState(INITIAL_LIST);
+
+  const { id } = useParams();
+
+  const [list, setList] = useState(null);
+
+  const [items, setItems] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+
+  const [error, setError] = useState(null);
+
   const [showResolved, setShowResolved] = useState(true);
 
-  const isOwner = list.ownerId === CURRENT_USER_ID;
+  const isOwner = list?.ownerId === CURRENT_USER_ID;
 
-  // Přidání položky
-  function addItem(name) {
+useEffect(() => {
+
+  async function loadItems() {
+
+    try {
+
+      setLoading(true);
+      setError(null);
+
+      const [listData, itemsData] = await Promise.all([
+        api.lists.getById(id),
+        api.items.getByListId(id)
+      ]);
+
+      setList(listData);
+      setItems(itemsData);
+
+    } catch (err) {
+
+      setError("Nepodařilo se načíst data.");
+
+    } finally {
+
+      setLoading(false);
+    }
+  }
+
+  loadItems(); 
+
+}, [id]);
+
+  async function addItem(name) {
+
     if (!name) return;
-    const newItem = { id: Date.now().toString(), name, resolved: false };
-    setList({ ...list, items: [...list.items, newItem] });
+
+    try {
+
+      const newItem = {
+        listId: id,
+        name,
+        resolved: false
+      };
+
+      const createdItem =
+        await api.items.create(newItem);
+
+      setItems(prev => [...prev, createdItem]);
+
+    } catch (err) {
+
+      setError("Nepodařilo se přidat položku.");
+    }
   }
 
-  // Přepínání vyřešené položky
-  function handleToggleResolved(id) {
-    const updatedItems = list.items.map(item =>
-      item.id === id ? { ...item, resolved: !item.resolved } : item
+  async function handleToggleResolved(itemId) {
+
+    try {
+
+      await api.items.toggle(itemId);
+
+      setItems(prev =>
+        prev.map(item =>
+          item.id === itemId
+            ? { ...item, resolved: !item.resolved }
+            : item
+        )
+      );
+
+    } catch (err) {
+
+      setError("Nepodařilo se změnit stav položky.");
+    }
+  }
+
+  async function handleDeleteItem(itemId) {
+
+    try {
+
+      await api.items.remove(itemId);
+
+      setItems(prev =>
+        prev.filter(item => item.id !== itemId)
+      );
+
+    } catch (err) {
+
+      setError("Nepodařilo se smazat položku.");
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="container">
+        <p>Načítání položek...</p>
+      </div>
     );
-    setList({ ...list, items: updatedItems });
   }
 
-  // Smazání položky
-  function handleDeleteItem(id) {
-    const updatedItems = list.items.filter(item => item.id !== id);
-    setList({ ...list, items: updatedItems });
+  if (error) {
+    return (
+      <div className="container">
+        <p style={{ color: "red" }}>{error}</p>
+      </div>
+    );
   }
 
-  // Přejmenování seznamu (jen vlastník)
-  function handleRename(newName) {
-    if (!isOwner || !newName) return; // kontrola vlastníka
-    setList({ ...list, name: newName });
-  }
-
-  // Přidání / odebrání členů (jen vlastník)
-  function handleAddMember(name) {
-    if (!isOwner || !name) return;
-    const newMember = { id: Date.now().toString(), name };
-    setList({ ...list, members: [...list.members, newMember] });
-  }
-
-  function handleRemoveMember(id) {
-    if (!isOwner) return;
-    setList({ ...list, members: list.members.filter(m => m.id !== id) });
-  }
-
-  // Člen může odejít
-  function handleLeaveList(userId) {
-    if (CURRENT_USER_ID !== userId) return; // bezpečnostní kontrola
-    setList({ ...list, members: list.members.filter(m => m.id !== userId) });
+  if (!list) {
+    return (
+      <div className="container">
+        <p>Seznam nenalezen.</p>
+      </div>
+    );
   }
 
   return (
     <div className="container">
+
       <ListHeader
         name={list.name}
-        isOwner={isOwner}       // jen vlastník může upravovat
-        onRename={handleRename}
+        isOwner={isOwner}
+        onRename={(newName) =>
+          setList(prev => ({
+            ...prev,
+            name: newName
+          }))
+        }
       />
 
       <MembersPreview
-        members={list.members}
+        members={list?.members || []}
         ownerId={list.ownerId}
         currentUserId={CURRENT_USER_ID}
-        onAddMember={handleAddMember}
-        onRemoveMember={handleRemoveMember}
-        onLeaveList={handleLeaveList}
+        onAddMember={(name) =>
+          setList(prev => ({
+            ...prev,
+            members: [
+              ...prev.members,
+              { id: Date.now().toString(), name }
+            ]
+          }))
+        }
+        onRemoveMember={(memberId) =>
+          setList(prev => ({
+            ...prev,
+            members: prev.members.filter(
+              m => m.id !== memberId
+            )
+          }))
+        }
+        onLeaveList={(userId) =>
+          setList(prev => ({
+            ...prev,
+            members: prev.members.filter(
+              m => m.id !== userId
+            )
+          }))
+        }
       />
 
       <AddItemForm onAddItem={addItem} />
 
-      <button onClick={() => setShowResolved(!showResolved)}>
-        {showResolved ? "Zobrazit jen nevyřešené" : "Zobrazit včetně vyřešených"}
+      <button
+        onClick={() =>
+          setShowResolved(prev => !prev)
+        }
+      >
+        {showResolved
+          ? "Zobrazit jen nevyřešené"
+          : "Zobrazit včetně vyřešených"}
       </button>
 
       <ItemsList
-        items={list.items}
+        items={items}
         showResolved={showResolved}
         onToggleResolved={handleToggleResolved}
         onDeleteItem={handleDeleteItem}
       />
+
+      {items.length === 0 && (
+        <p>Žádné položky v seznamu.</p>
+      )}
+
     </div>
   );
 }

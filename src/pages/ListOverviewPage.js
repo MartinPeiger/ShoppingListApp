@@ -1,54 +1,75 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import ListTile from "../components/ListTile";
 import AddListModal from "../components/AddListModal";
 
-const CURRENT_USER_ID = "u1";
+import { api } from "../services/apiClient";
 
-const INITIAL_LISTS = [
-  {
-    id: "1",
-    name: "Nákup na víkend",
-    ownerId: "u1",
-    archived: false
-  },
-  {
-    id: "2",
-    name: "Vánoční nákup",
-    ownerId: "u1",
-    archived: true
-  },
-  {
-    id: "3",
-    name: "Práce",
-    ownerId: "u2",
-    archived: false
-  }
-];
+const CURRENT_USER_ID = "u1";
 
 function ListsOverviewPage() {
 
-  const [lists, setLists] = useState(INITIAL_LISTS);
+  const [lists, setLists] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+
+  const [error, setError] = useState(null);
 
   const [showArchived, setShowArchived] = useState(true);
 
   const [showModal, setShowModal] = useState(false);
 
-  function handleAddList(name) {
+  useEffect(() => {
 
-    const newList = {
-      id: Date.now().toString(),
-      name,
-      ownerId: CURRENT_USER_ID,
-      archived: false
-    };
+    async function loadLists() {
 
-    setLists([...lists, newList]);
+      try {
 
-    setShowModal(false);
+        setLoading(true);
+
+        const data = await api.lists.getAll();
+
+        setLists(data);
+
+      } catch (err) {
+
+        setError("Nepodařilo se načíst seznamy.");
+
+      } finally {
+
+        setLoading(false);
+
+      }
+    }
+
+    loadLists();
+
+  }, []);
+
+  async function handleAddList(name) {
+
+    try {
+
+      const newList = {
+        name,
+        ownerId: CURRENT_USER_ID,
+        archived: false
+      };
+
+      const createdList =
+        await api.lists.create(newList);
+
+      setLists([...lists, createdList]);
+
+      setShowModal(false);
+
+    } catch (err) {
+
+      setError("Nepodařilo se vytvořit seznam.");
+    }
   }
 
-  function handleDeleteList(id) {
+  async function handleDeleteList(id) {
 
     const confirmed = window.confirm(
       "Opravdu chcete smazat seznam?"
@@ -56,16 +77,33 @@ function ListsOverviewPage() {
 
     if (!confirmed) return;
 
-    const updatedLists = lists.filter(
-      list => list.id !== id
-    );
+    try {
 
-    setLists(updatedLists);
+      await api.lists.remove(id);
+
+      const updatedLists = lists.filter(
+        list => list.id !== id
+      );
+
+      setLists(updatedLists);
+
+    } catch (err) {
+
+      setError("Nepodařilo se smazat seznam.");
+    }
   }
 
   const filteredLists = showArchived
     ? lists
     : lists.filter(list => !list.archived);
+
+  if (loading) {
+    return <div>Načítání...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
 
   return (
     <div className="container">
