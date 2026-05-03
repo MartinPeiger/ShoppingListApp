@@ -170,7 +170,7 @@ useEffect(() => {
         onRemoveMember={(memberId) =>
           setList(prev => ({
             ...prev,
-            members: prev.members.filter(
+            members: (prev.members || []).filter(
               m => m.id !== memberId
             )
           }))
@@ -178,7 +178,7 @@ useEffect(() => {
         onLeaveList={(userId) =>
           setList(prev => ({
             ...prev,
-            members: prev.members.filter(
+            members: (prev.members || []).filter(
               m => m.id !== userId
             )
           }))

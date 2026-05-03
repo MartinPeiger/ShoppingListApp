@@ -3,13 +3,15 @@ export const lists = [
     id: "1",
     name: "Potraviny",
     ownerId: "u1",
-    archived: false
+    archived: false,
+    members: []
   },
   {
     id: "2",
     name: "Drogerie",
     ownerId: "u2",
-    archived: true
+    archived: true,
+    members: []
   }
 ];
 
