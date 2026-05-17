@@ -5,6 +5,11 @@ let db = [...items];
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const itemMockApi = {
+  async getAll() {
+    await delay(300);
+    return [...db];
+  },
+
   async getByListId(listId) {
     await delay(300);
 

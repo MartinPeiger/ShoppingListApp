@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useTranslation } from "../i18n";
 
 function AddItemForm({ onAddItem }) {
+  const { t } = useTranslation();
 
   const [value, setValue] = useState("");
 
@@ -18,10 +20,10 @@ function AddItemForm({ onAddItem }) {
       <input
         value={value}
         onChange={e => setValue(e.target.value)}
-        placeholder="Nová položka"
+        placeholder={t("newItemPlaceholder")}
       />
 
-      <button>Přidat</button>
+      <button>{t("add")}</button>
     </form>
   );
 }

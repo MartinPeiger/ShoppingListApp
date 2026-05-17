@@ -1,4 +1,8 @@
+import { useTranslation } from "../i18n";
+
 function ItemRow({ id, name, resolved, onToggleResolved, onDelete }) {
+  const { t } = useTranslation();
+
   return (
     <div className="item">
       <input
@@ -9,7 +13,7 @@ function ItemRow({ id, name, resolved, onToggleResolved, onDelete }) {
       <span style={{ textDecoration: resolved ? "line-through" : "none" }}>
         {name}
       </span>
-      <button onClick={() => onDelete(id)}>Smazat</button>
+      <button onClick={() => onDelete(id)}>{t("delete")}</button>
     </div>
   );
 }

@@ -1,3 +1,5 @@
+import { useTranslation } from "../i18n";
+
 export default function MembersPreview({
   members,
   ownerId,
@@ -6,6 +8,7 @@ export default function MembersPreview({
   onRemoveMember,
   onLeaveList
 }) {
+  const { t } = useTranslation();
 
   const isOwner = currentUserId === ownerId;
 
@@ -13,8 +16,7 @@ export default function MembersPreview({
 
   return (
     <div className="members-preview">
-
-      <h3>Členové:</h3>
+      <h3>{t("members")}</h3>
 
       <ul>
         {safeMembers.map(member => (
@@ -23,13 +25,13 @@ export default function MembersPreview({
 
             {isOwner && member.id !== ownerId && (
               <button onClick={() => onRemoveMember(member.id)}>
-                Odstranit
+                {t("remove")}
               </button>
             )}
 
             {!isOwner && member.id === currentUserId && (
               <button onClick={() => onLeaveList(member.id)}>
-                Odejít
+                {t("leave")}
               </button>
             )}
           </li>
@@ -40,7 +42,7 @@ export default function MembersPreview({
         <div>
           <input
             id="newMemberName"
-            placeholder="Jméno nového člena"
+            placeholder={t("newMemberName")}
           />
 
           <button
@@ -54,7 +56,7 @@ export default function MembersPreview({
               input.value = "";
             }}
           >
-            Přidat člena
+            {t("addMember")}
           </button>
         </div>
       )}

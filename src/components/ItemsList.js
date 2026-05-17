@@ -1,16 +1,19 @@
+import { useTranslation } from "../i18n";
+
 export default function ItemsList({
   items,
   showResolved,
   onToggleResolved,
   onDeleteItem
 }) {
+  const { t } = useTranslation();
 
   const filteredItems = showResolved
     ? items
     : items.filter(item => !item.resolved);
 
   if (filteredItems.length === 0) {
-    return
+    return null;
   }
 
   return (
@@ -45,8 +48,8 @@ export default function ItemsList({
             }
           >
             {item.resolved
-              ? "Označit jako nevyřešené"
-              : "Vyřešit"}
+              ? t("markUnresolved")
+              : t("resolve")}
           </button>
 
           <button
@@ -54,7 +57,7 @@ export default function ItemsList({
               onDeleteItem(item.id)
             }
           >
-            Smazat
+            {t("delete")}
           </button>
 
         </li>

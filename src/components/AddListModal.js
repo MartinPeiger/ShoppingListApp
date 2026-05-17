@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useTranslation } from "../i18n";
 
 function AddListModal({ onAdd, onClose }) {
+  const { t } = useTranslation();
 
   const [value, setValue] = useState("");
 
@@ -18,7 +20,7 @@ function AddListModal({ onAdd, onClose }) {
 
       <div className="modal">
 
-        <h2>Nový seznam</h2>
+        <h2>{t("addListTitle")}</h2>
 
         <form onSubmit={handleSubmit}>
 
@@ -27,20 +29,20 @@ function AddListModal({ onAdd, onClose }) {
             onChange={(e) =>
               setValue(e.target.value)
             }
-            placeholder="Název seznamu"
+            placeholder={t("listNamePlaceholder")}
           />
 
           <div style={{ marginTop: "10px" }}>
 
             <button type="submit">
-              Přidat
+              {t("add")}
             </button>
 
             <button
               type="button"
               onClick={onClose}
             >
-              Zavřít
+              {t("close")}
             </button>
 
           </div>
